@@ -74,6 +74,7 @@ python3 -m http.server 8777    # then open http://localhost:8777
 
 Push to a public repo → **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
 The site is the repo root (`index.html`).
+https://emweber93.github.io/germany-relocation-dashboard/
 
 ## Tech & licenses
 
