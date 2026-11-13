@@ -33,10 +33,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:16px;
 .link{background:none;border:none;color:var(--accent);padding:0;font-size:12.5px;text-decoration:none;border-bottom:1px dashed #6aa6ff66}
 .link:hover{color:#8fc0ff}
 
-main{display:grid;grid-template-columns:340px 1fr;height:calc(100% - 59px)}
+main{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 59px);min-height:0;overflow:hidden}
 
 /* sidebar */
-#controls{overflow:auto;border-right:1px solid var(--line);padding:16px 14px 60px;display:flex;flex-direction:column;gap:14px}
+#controls{overflow:auto;min-height:0;border-right:1px solid var(--line);padding:16px 14px 60px;display:flex;flex-direction:column;gap:14px}
 .panel{background:linear-gradient(180deg,var(--panel),#13161d);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
 .panel-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
 .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:600;margin-bottom:10px}
@@ -86,13 +86,13 @@ main{display:grid;grid-template-columns:340px 1fr;height:calc(100% - 59px)}
 .dot.fam{background:var(--good);box-shadow:0 0 0 3px #9ed65922}
 
 /* stage */
-#stage{display:flex;flex-direction:column;min-width:0}
-#map{height:46%;min-height:240px;background:#0a0c10;position:relative}
+#stage{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+#map{flex:0 0 46%;min-height:240px;background:#0a0c10;position:relative}
 .leaflet-container{background:#0a0c10;font:inherit}
 .pin{width:14px;height:14px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px #000a}
 .pin.work{background:#6aa6ff}.pin.fam{background:var(--good)}
 
-#results{flex:1;overflow:auto;background:var(--bg2);border-top:1px solid var(--line)}
+#results{flex:1 1 0;min-height:0;overflow:auto;background:var(--bg2);border-top:1px solid var(--line)}
 .res-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;
   position:sticky;top:0;background:var(--bg2);z-index:2;border-bottom:1px solid var(--line)}
 .count{font-weight:600;color:var(--ink)}

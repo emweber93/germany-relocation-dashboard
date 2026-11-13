@@ -339,6 +339,10 @@ async function init() {
   document.getElementById('helpClose').onclick = () => document.getElementById('help').classList.remove('open');
   document.getElementById('hintClose').onclick = () => { state.hintSeen = true; save(); document.getElementById('hint').classList.add('hidden'); };
   refresh();
+  // ensure Leaflet matches the final container size (layout settles after the table renders)
+  const fixSize = () => { if (map) map.invalidateSize(); };
+  requestAnimationFrame(fixSize); setTimeout(fixSize, 200);
+  window.addEventListener('resize', fixSize);
 }
 function exportSettings() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
