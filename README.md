@@ -1,82 +1,81 @@
-# Where to live in Germany — district dashboard
+# Where to live — commuter-belt town dashboard
 
-An interactive dashboard that scores every German district (*Landkreis* /
-*kreisfreie Stadt*, ~400) against the criteria that matter for a house move, with
-weights you adjust live. Built to run as a static site on GitHub Pages — no server,
-no build step, no account needed to use it.
+An interactive dashboard that scores the **towns within ~50 km of the SAP
+St. Leon-Rot / Walldorf campuses** (the realistic commuter belt, ~370 municipalities
+incl. Heidelberg, Mannheim, Karlsruhe, Speyer…) against the criteria that matter for a
+house move, with weights you adjust live. Static site for GitHub Pages — no server,
+no build step to use it, no account.
 
 ![screenshot](docs/screenshot.png)
 
 ## What it does
 
-- Ranks all districts by a weighted score across your criteria.
-- Re-ranks instantly as you drag weight sliders.
-- Colours a map of Germany by score and lets you click any district for a breakdown.
-- Computes straight-line distances to your anchors: **SAP St. Leon-Rot (ROT)**,
-  **SAP Walldorf (WDF)**, **Heidelberg**, and a **family** location you set yourself.
-- Hard-filters by maximum distance (e.g. "work ≤ 40 km").
-- Lets you type/override any value per district and **export/import** your whole
-  setup as a JSON file. Everything is saved in your browser's local storage.
+- Ranks the towns by a weighted score across your criteria; re-ranks instantly as you drag sliders.
+- Colours a map of the commuter belt by score; click any town for a full breakdown.
+- Computes straight-line distances to your anchors: **SAP St. Leon-Rot**, **SAP Walldorf**,
+  **Heidelberg**, and a **family** location you set yourself.
+- Real per-town amenity counts from OpenStreetMap (groceries, schools/childcare, health/green/social),
+  counted *inside each town's boundary* (point-in-polygon).
+- Hard-filters by max distance (e.g. "work ≤ 20 km"), edits/overrides any value per town,
+  and **exports/imports** your whole setup as JSON. Everything saves in your browser.
 
-Your family/home location and all your edits stay **in your browser** — they are
-never written to the repository or uploaded anywhere.
+Your family/home location and all edits stay **in your browser** — never written to the repo.
 
 ## Criteria & data sources
 
 | Criterion | Signal | Source | Confidence |
 |---|---|---|---|
 | Commute to work | avg straight-line km to SAP ROT + WDF | computed | real |
-| Near Heidelberg | straight-line km | computed | real |
-| Near family | straight-line km to your anchor | computed in browser | real |
+| Near Heidelberg / family | straight-line km | computed (family in-browser) | real |
 | Int'l / English school | km to nearest of ~34 international schools | curated (`scripts/intl_schools.csv`) | real, coords city-approx |
-| Political fit | 2025 Bundestag 2nd-vote share of your chosen party | Die Bundeswahlleiterin | real but **coarse (per state)** |
-| Nature / green space | non-built-up land share | GENESIS (needs token) | **empty — editable** |
-| Internationality | foreign-population share | GENESIS (needs token) | **empty — editable** |
-| Safety | crime frequency /100k | BKA PKS | **empty — editable** |
-| Low cost | building-land price proxy €/m² | GENESIS (needs token) | **empty — editable** |
-| Population / density | inhabitants; area is computed from geometry | Wikidata | auto-fills on build (area already real) |
+| Groceries & daily shops | count in the town boundary | OpenStreetMap | real |
+| Schools & childcare | schools + Kitas in the town | OpenStreetMap | real |
+| Health, green & social | doctors/pharmacies/parks/restaurants in the town | OpenStreetMap | real |
+| Political fit | 2025 Bundestag 2nd-vote share of your party | Die Bundeswahlleiterin | real, **by district (coarse)** |
+| Internationality / Safety / Cost | foreign share / crime / land-price | district-level | **empty — editable** |
 
-**Honesty notes:** political data is only one value per *state* (16 values spread
-over ~400 districts) — directionally useful, not fine-grained. The four GENESIS
-fields ship empty: fill them per district in the UI, or wire a token (below).
-Housing *cost* uses a land-price proxy, not rents.
+**Honesty notes:** amenity counts are raw OSM counts (log-scaled in the score so a big city
+doesn't swamp everything, but larger towns still score higher — weight to taste). Political,
+internationality, safety and cost are only available per *district*, inherited by a district's
+towns; the last three ship empty — type them in per town, or wire a GENESIS token.
 
 ## Rebuild / refresh the data
 
-Pure Python standard library — **no dependencies to install**.
+Pure Python standard library — **no dependencies**. Two steps (districts feed town inheritance):
 
 ```bash
-bash scripts/fetch_sources.sh        # download boundaries + election CSV into data/raw/
-python3 -I scripts/build_data.py     # -> data/kreise.json + data/kreise.geojson
+bash scripts/fetch_sources.sh          # boundaries, election CSV, OSM towns/cities/amenities
+python3 -I scripts/build_data.py       # -> data/kreise.json   (district layer, for inheritance)
+python3 -I scripts/build_towns.py      # -> data/towns.json + data/towns.geojson  (what the site serves)
 ```
 
-`data/raw/` is git-ignored; the generated `data/kreise.json` and `data/kreise.geojson`
-are committed so the site works with zero setup.
+`data/raw/` is git-ignored. The committed `data/towns.json` + `data/towns.geojson` make the
+site work with zero setup. OSM (Overpass) is rate-limited and sometimes returns 502 when busy —
+`fetch_sources.sh` retries across mirrors; just re-run if one step fails.
 
-### Filling the GENESIS fields (optional)
+To change the radius or offices, edit the constants at the top of `scripts/build_towns.py`
+(and the bbox/anchors in `fetch_sources.sh`).
 
-The four empty fields need a free [regionalstatistik.de](https://www.regionalstatistik.de)
-account. `scripts/fetch_genesis.py` is a documented template for it (the REST pattern
-is right; table codes need a one-time check). Easiest alternative: just type the
-values into each district's detail panel — they're saved locally and exportable.
+### Filling Internationality / Safety / Cost (optional)
+
+These are district-level and need a free [regionalstatistik.de](https://www.regionalstatistik.de)
+token; `scripts/fetch_genesis.py` is a documented template. Easiest: just type values into a
+town's detail panel — saved locally and exportable.
 
 ## Run locally
 
 ```bash
-python3 -m http.server 8777
-# open http://localhost:8777
+python3 -m http.server 8777    # then open http://localhost:8777
 ```
 
 ## Deploy on GitHub Pages
 
-Push to a public repo, then **Settings → Pages → Source: Deploy from a branch →
-`main` / `/ (root)`**. The site is the repo root (`index.html`).
+Push to a public repo → **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
+The site is the repo root (`index.html`).
 
 ## Tech & licenses
 
-Vanilla HTML/CSS/JS + [Leaflet](https://leafletjs.com) (via CDN). No framework, no tracking.
+Vanilla HTML/CSS/JS + [Leaflet](https://leafletjs.com) (CDN). No framework, no tracking.
 
-- District boundaries © [BKG](https://www.bkg.bund.de) (VG250), via the jgehrcke dataset.
-- Election results © [Die Bundeswahlleiterin](https://www.bundeswahlleiterin.de)
-  (Datenlizenz Deutschland – Namensnennung 2.0).
-- Population from [Wikidata](https://www.wikidata.org) (CC0).
+- Town/city boundaries & amenities © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL), via Overpass.
+- District boundaries © [BKG](https://www.bkg.bund.de) (VG250). Election © [Die Bundeswahlleiterin](https://www.bundeswahlleiterin.de) (dl-de/by-2-0).
