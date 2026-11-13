@@ -369,6 +369,8 @@ including nearby cities (Heidelberg, Mannheim, Karlsruhe, Speyer…).</p>
 <tr><td>Groceries · Schools & childcare · Health/green/social</td><td>OpenStreetMap</td><td>Counted inside each town's boundary. Log-scaled so a big city doesn't swamp the rest.</td></tr>
 <tr><td>Int'l / English school</td><td>Curated list</td><td>Distance to nearest of ~34 international schools.</td></tr>
 <tr><td>Political fit</td><td>Bundeswahlleiterin 2025</td><td>2nd-vote share by district, inherited by its towns.</td></tr>
-<tr><td>Internationality · Safety · Cost</td><td>district / editable</td><td>Not available per town — inherited, blank until you add data.</td></tr></table>
+<tr><td>Internationality</td><td>destatis GENESIS</td><td>Foreign-resident share by district, inherited by its towns.</td></tr>
+<tr><td>Safety</td><td>BKA PKS 2025</td><td>Total-crime frequency (per 100k) by district, inherited by its towns.</td></tr>
+<tr><td>Cost (land price)</td><td>editable</td><td>No free per-town source — type rent/price per town; saved in your browser.</td></tr></table>
 <p>Boundaries & amenities © OpenStreetMap contributors. Everything is saved locally; Export to back up or share.</p>`;
 init();

@@ -62,6 +62,7 @@ def crime_from_bka():
 
 
 def simple_csv(path, scale=1.0):
+    """Read 'ags;value' CSV. Values are plain floats ('21.3' or '21,3')."""
     if not path.exists():
         return {}
     out = {}
@@ -69,7 +70,7 @@ def simple_csv(path, scale=1.0):
         if len(row) < 2:
             continue
         ags = row[0].strip().zfill(5)
-        val = row[1].strip().replace(".", "").replace(",", ".")
+        val = row[1].strip().replace(",", ".")
         if ags.isdigit() and val:
             try:
                 out[ags] = round(float(val) * scale, 2)

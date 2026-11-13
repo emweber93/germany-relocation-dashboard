@@ -32,35 +32,37 @@ Your family/home location and all edits stay **in your browser** — never writt
 | Schools & childcare | schools + Kitas in the town | OpenStreetMap | real |
 | Health, green & social | doctors/pharmacies/parks/restaurants in the town | OpenStreetMap | real |
 | Political fit | 2025 Bundestag 2nd-vote share of your party | Die Bundeswahlleiterin | real, **by district (coarse)** |
-| Internationality / Safety / Cost | foreign share / crime / land-price | district-level | **empty — editable** |
+| Internationality | foreign-resident share | destatis GENESIS (12521/12411) | real, **by district** |
+| Safety | total-crime frequency (HZ /100k) | BKA PKS 2025 | real, **by district** |
+| Cost (land price) | — | no free per-district source | **editable only** |
 
 **Honesty notes:** amenity counts are raw OSM counts (log-scaled in the score so a big city
 doesn't swamp everything, but larger towns still score higher — weight to taste). Political,
-internationality, safety and cost are only available per *district*, inherited by a district's
-towns; the last three ship empty — type them in per town, or wire a GENESIS token.
+internationality and safety are only available per *district*, inherited by a district's towns.
+**Cost** stays editable: land price is only published per *Bundesland* (too coarse to tell towns
+in one state apart), ImmoScout24 can't be scraped (ToS + bot-blocking), and Mietspiegel are
+scattered per-city PDFs — so type rent/price figures into a town's detail panel as you research.
 
 ## Rebuild / refresh the data
 
-Pure Python standard library — **no dependencies**. Two steps (districts feed town inheritance):
+Pure Python standard library — **no dependencies**. The committed `data/*.json` already hold
+real values, so the site works with zero setup. To refresh:
 
 ```bash
 bash scripts/fetch_sources.sh          # boundaries, election CSV, OSM towns/cities/amenities
 python3 -I scripts/build_data.py       # -> data/kreise.json   (district layer, for inheritance)
+# district indicators (optional, needs a free destatis account for internationality):
+#   download BKA crime xlsx into data/raw/bka_kreise_hz.xlsx (see scripts/enrich_kreise.py header)
+export GENESIS_USER=... GENESIS_PASS=...   # https://www-genesis.destatis.de → Registrierung (alphanumeric pw!)
+python3 -I scripts/fetch_destatis.py   # -> data/raw/foreign_share.csv + population.csv
+python3 -I scripts/enrich_kreise.py    # merge crime + foreign share into kreise.json
 python3 -I scripts/build_towns.py      # -> data/towns.json + data/towns.geojson  (what the site serves)
 ```
 
-`data/raw/` is git-ignored. The committed `data/towns.json` + `data/towns.geojson` make the
-site work with zero setup. OSM (Overpass) is rate-limited and sometimes returns 502 when busy —
-`fetch_sources.sh` retries across mirrors; just re-run if one step fails.
-
-To change the radius or offices, edit the constants at the top of `scripts/build_towns.py`
-(and the bbox/anchors in `fetch_sources.sh`).
-
-### Filling Internationality / Safety / Cost (optional)
-
-These are district-level and need a free [regionalstatistik.de](https://www.regionalstatistik.de)
-token; `scripts/fetch_genesis.py` is a documented template. Easiest: just type values into a
-town's detail panel — saved locally and exportable.
+`data/raw/` is git-ignored. OSM (Overpass) is rate-limited and sometimes returns 502 when busy —
+`fetch_sources.sh` retries across mirrors; just re-run if one step fails. GENESIS REST auth is
+header-based (see `scripts/fetch_destatis.py`). To change the radius or offices, edit the
+constants atop `scripts/build_towns.py` (and the bbox/anchors in `fetch_sources.sh`).
 
 ## Run locally
 
