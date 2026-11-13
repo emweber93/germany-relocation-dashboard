@@ -11,66 +11,72 @@
 </head>
 <body>
 <header>
-  <h1>Where to live in Germany</h1>
-  <p class="sub">Score the towns in your ~50&nbsp;km commuter belt. Everything is adjustable, saved in your browser.
-     <button id="helpBtn" class="link">What does the data mean?</button></p>
+  <div class="brand"><span class="logo">🏡</span>
+    <div><h1>Where to live</h1><p class="sub">Towns in your ~50&nbsp;km commuter belt, scored your way</p></div>
+  </div>
   <div class="actions">
-    <button id="exportBtn">Export settings</button>
-    <label class="filebtn">Import settings<input id="importFile" type="file" accept="application/json" hidden></label>
-    <button id="resetBtn" class="danger">Reset all</button>
+    <button id="helpBtn" class="ghost" title="How scoring works">? Help</button>
+    <button id="exportBtn" class="ghost">Export</button>
+    <label class="ghost filebtn">Import<input id="importFile" type="file" accept="application/json" hidden></label>
+    <button id="resetBtn" class="ghost danger">Reset</button>
   </div>
 </header>
 
 <main>
   <aside id="controls">
-    <section>
-      <div class="sec-head"><h2>Criteria weights</h2><button id="allOff" class="link">all 0</button></div>
-      <p class="hint">0 = ignore. Higher weight = matters more. Criteria with no data don't count until you add it.</p>
+    <div id="hint" class="hint-banner hidden">
+      <button id="hintClose" class="x">✕</button>
+      <b>Tune it to you.</b> Drag the sliders to say what matters — the ranking and map update live.
+      Click any town for details. Set a <b>family</b> anchor below to score distance to them.
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h2>Priorities</h2><button id="allOff" class="link">reset to 0</button></div>
       <div id="weights"></div>
-    </section>
+    </div>
 
-    <section>
+    <div class="panel">
       <h2>Political fit</h2>
-      <label class="row">Prefer district where this party is strongest:
-        <select id="politicsTarget"><option value="">— off —</option></select>
-      </label>
-      <p class="hint">Uses 2025 Bundestag second-vote share, by state (coarse — one value per state).</p>
-    </section>
+      <label class="field">Prefer towns where this party polls highest
+        <select id="politicsTarget"><option value="">— off —</option></select></label>
+      <p class="note">2025 Bundestag 2nd-vote share, by district (coarse).</p>
+    </div>
 
-    <section>
-      <h2>Your anchors &amp; filters</h2>
+    <div class="panel">
+      <h2>Anchors</h2>
       <div id="anchors"></div>
-      <p class="hint">Family/home stay only in this browser — never uploaded.</p>
-    </section>
+    </div>
   </aside>
 
   <section id="stage">
     <div id="map"></div>
     <div id="results">
       <div class="res-head">
-        <span id="count"></span>
-        <span class="legend"><i class="g0"></i><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i> low → high score</span>
+        <span id="count" class="count"></span>
+        <span class="legend">lower&nbsp;<span class="legbar"></span>&nbsp;higher&nbsp;<em>(rank in view)</em></span>
       </div>
-      <table id="table">
-        <thead><tr>
-          <th data-sort="rank">#</th><th data-sort="name">Town</th><th data-sort="kreis">District</th>
-          <th data-sort="score">Score</th><th data-sort="dist_work">Work km</th>
-          <th data-sort="dist_heidelberg">HD km</th><th data-sort="dist_family">Family km</th>
-          <th data-sort="groceries">Shops</th><th data-sort="schools_childcare">Schools</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
+      <div class="tablewrap">
+        <table id="table">
+          <thead><tr>
+            <th data-sort="rank">#</th><th data-sort="name">Town</th><th data-sort="kreis">District</th>
+            <th data-sort="score">Score</th><th data-sort="dist_work">Work</th>
+            <th data-sort="dist_heidelberg">HD</th><th data-sort="dist_family">Family</th>
+            <th data-sort="groceries">Shops</th><th data-sort="schools_childcare">Schools</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
-  <aside id="detail" class="hidden">
-    <button id="detailClose" class="link">✕ close</button>
+  <aside id="detail">
+    <button id="detailClose" class="x big">✕</button>
     <div id="detailBody"></div>
   </aside>
 </main>
 
-<div id="help" class="modal hidden"><div class="modal-box">
-  <button id="helpClose" class="link">✕</button>
+<div id="help" class="modal"><div class="modal-box">
+  <button id="helpClose" class="x big">✕</button>
   <div id="helpBody"></div>
 </div></div>
 
